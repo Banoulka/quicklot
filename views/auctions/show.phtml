@@ -1,0 +1,165 @@
+<?php
+/**
+ * @var Auction $auction
+ * @var BiddingActivity $biddingActivity
+ */
+
+use app\bframe\auth\Auth;
+use app\models\Auction;
+use app\models\BiddingActivity;
+use app\models\lib\Helpers;
+use Carbon\Carbon;
+
+
+$biddingActivity = $auction->biddingActivity()->get();
+
+$owner = $auction->lot->owner()->get();
+?>
+<section class="section">
+    <div class="container">
+        <div class="columns">
+            <div class="column br-right">
+                <div class="card auction <?= $auction->isFinished() ? 'ended' : ''?>">
+                    <header class="card-header px-3 py-2 is-flex is-flex-direction-column">
+                        <h1 style="font-size: 46px; font-weight: 300" class="card-header-title is-flex is-flex-direction-row is-align-content-center">
+                            <?= $auction->lot->name ?>
+                            <span class="tag is-dark" style="margin-left: auto;"><?= $auction->lot->category()->get()->name ?></span>
+                        </h1>
+                        <p class="small" style="display: block !important;">Posted By <?= $owner->name ?> @ Auction House</p>
+                    </header>
+                    <div class="card-content">
+                        <div class="content">
+                            <p class="subtitle"><?= $auction->lot->description ?></p>
+                            <?php foreach ($auction->lot->images()->get() as $image) : ?>
+                                <img src="/images/uploads/<?= $image->path ?>" alt="Lot Image" class="lot-image">
+                            <?php endforeach; ?>
+                            <p class="mt-2">Started at: £<?= $auction->price ?></p>
+                        </div>
+                    </div>
+                    <footer class="card-footer px-5 py-4">
+                        <?php if ($auction->isFinished()) : ?>
+                            <p class="has-text-danger">Ended <?= Carbon::parse($auction->end_date)->diffForHumans() ?></p>
+                        <?php else : ?>
+                            <time class="has-text-info">Ends in <?= Carbon::parse($auction->end_date)->diffForHumans([], \Carbon\CarbonInterface::DIFF_ABSOLUTE, false, 3) ?></time>
+                        <?php endif; ?>
+                    </footer>
+                </div>
+
+                <h3 class="my-5 title is-3">Place a bid: <span style="margin-left: 100px;">+ £<?= $auction->highestBid()->amount ?? $auction->price ?></span></h3>
+                <?php if (!Auth::loggedIn()) : ?>
+                    <p>Please <a href="/login">login</a> to place a bid</p>
+                <?php elseif ($auction->isFinished()) : ?>
+                    <p>Bidding has ended.</p>
+                <?php elseif ($auction->lot->user_id != Auth::User()->id) : ?>
+                    <form action="/auctions/bid" method="post">
+                        <input type="hidden" value="<?= $auction->id ?>" name="auction_id">
+                        <div class="field" id="price-field">
+                            <label class="label" for="amount">Bid Amount:</label>
+                            <div class="control has-icons-left">
+                                <input required type="number" class="input <?= isset($error) ? 'is-danger' : '' ?>" id="amount" placeholder="Enter a bidding price" name="amount" value="<?= $bid ?? '' ?>">
+                                <span class="icon is-small is-left">
+                                    <i class="fas fa-pound-sign"></i>
+                                </span>
+                            </div>
+                            <?php if (isset($error)) : ?>
+                                <p class="has-text-danger mt-3"><?= $error ?></p>
+                            <?php endif; ?>
+                        </div>
+
+                        <button class="button is-success" type="submit">Bid</button>
+                    </form>
+                <?php else : ?>
+                    <p>You cannot place a bid on your own auction</p>
+                <?php endif; ?>
+
+                <a href="<?= $_SERVER['HTTP_REFERER'] ?? '/auctions'?>" style="margin-top: 50px; display: block;" class="ml-2 is-4">Back to Auctions</a>
+            </div>
+            <div class="column has-text-centered has-line">
+                <h2 class="title mt-4">Bidding Activity:</h2>
+
+                <?php foreach ($biddingActivity as $activity) : ?>
+
+                    <div class="level profile-level">
+                        <div class="level-left">
+                            <img src="/images/<?= $activity->user->profile_picture ? "uploads/users/" . $activity->user->profile_picture : "placeholder.png"  ?>" alt="Profile Image" class="profile-display">
+                            <span class="ml-4"><?= $activity->user->name ?></span>
+                        </div>
+                        <div class="level-right">
+                            <div class="is-flex is-flex-direction-column">
+                                <span class="bold">£<?= $activity->amount ?></span>
+                                <span class="small"><?= Helpers::timeElapse($activity->created_at) ?></span>
+                            </div>
+                        </div>
+                    </div>
+
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .lot-image {
+        width: 140px;
+        height: auto;
+        margin: 0.2em 0.8em;
+    }
+
+    .has-line {
+        position: relative;
+    }
+
+    .has-line:before {
+        margin-top: 90px;
+        content:"";
+        width:1px;
+        z-index: -4;
+        height:100%;
+        display:block;
+        left:50%;
+        position:absolute;
+        background-image: -webkit-linear-gradient(top, #fff, #735a11, #fff);
+        background-image: -moz-linear-gradient(top, #fff, #735a11, #fff);
+        background-image: -ms-linear-gradient(top, #fff, #735a11, #fff);
+        background-image: -o-linear-gradient(top, #fff, #735a11, #fff);
+        background-image: linear-gradient(top, #fff, #735a11, #fff);
+    }
+
+    .profile-display {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+    }
+
+    .profile-level span {
+        font-size: 17px;
+    }
+
+    .profile-level {
+        border-radius: 4px;
+        border: 1px solid #b1b1b1;
+        z-index: 80;
+        padding: 1em 1.4em;
+        background-color: #fffbe9;
+        width: 70%;
+        margin: auto;
+    }
+
+    .small {
+        color: #565656;
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+    }
+
+    .auction.ended:before {
+        content: 'sold';
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        color: rgba(255, 0, 0, 0.08);
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform-origin: center;
+        transform: rotate(30deg) scale(12);
+    }
+</style>

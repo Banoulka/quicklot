@@ -1,0 +1,58 @@
+<section class="section">
+    <div class="container">
+
+        <div class="columns">
+            <div class="column is-half is-offset-one-quarter">
+
+                <h1 class="title">
+                    Login
+                </h1>
+
+                <form action="/login" method="post">
+                    <div class="field">
+                        <label class="label">Email</label>
+                        <div class="control has-icons-left">
+                            <input class="input <?= $form->errorsClass('email') ?>" type="text" placeholder="Enter email" name="email" value="<?= $data['email'] ?? '' ?>">
+
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-envelope"></i>
+                            </span>
+                        </div>
+                        <?php $form->displayErrors('email'); ?>
+                    </div>
+
+                    <div class="field">
+                        <label class="label" for="password">Password</label>
+                        <div class="control">
+                            <input class="input <?= $form->errorsClass('password') ?>" id="password" type="password" placeholder="Enter password" name="password" value="<?= $data['password'] ?? '' ?>">
+                        </div>
+                        <?php $form->displayErrors('password'); ?>
+                    </div>
+
+                    <div class="field">
+                        <div class="control">
+                            <label class="checkbox">
+                                <input type="checkbox" name="remember_me" <?= isset($data['remember_me']) ? 'checked' : '' ?>>
+                                Remember me
+                            </label>
+                        </div>
+                    </div>
+
+                    <?php if (isset($error)) : ?>
+                        <p class="has-text-danger mb-4"><?= $error ?></p>
+                    <?php endif; ?>
+
+                    <div class="field is-grouped">
+                        <div class="control">
+                            <button class="button is-warning" type="submit">Login</button>
+                        </div>
+                        <div class="control">
+                            <button class="button is-link is-light" type="reset">Reset</button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

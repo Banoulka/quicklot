@@ -1,0 +1,61 @@
+<section class="section">
+    <div class="container">
+
+        <div class="columns">
+            <div class="column is-half is-offset-one-quarter">
+
+                <h1 class="title">
+                    Signup
+                </h1>
+
+                <form action="/signup" method="post">
+
+                    <div class="field">
+                        <label class="label" for="name">Name</label>
+                        <div class="control">
+                            <input class="input <?= $form->errorsClass('name') ?>" id="name" placeholder="Enter your name" name="name" value="<?= $data['name'] ?? '' ?>">
+                        </div>
+                        <?php $form->displayErrors('name'); ?>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Email</label>
+                        <div class="control has-icons-left">
+                            <input class="input <?= $form->errorsClass('email') ?>" type="text" placeholder="Enter email" name="email" value="<?= $data['email'] ?? '' ?>">
+
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-envelope"></i>
+                            </span>
+                        </div>
+                        <?php $form->displayErrors('email'); ?>
+                    </div>
+
+                    <div class="field">
+                        <label class="label" for="password">Password</label>
+                        <div class="control">
+                            <input class="input <?= $form->errorsClass('password') ?>" id="password" type="password" placeholder="Enter password" name="password" value="<?= $data['password'] ?? '' ?>">
+                        </div>
+                        <?php $form->displayErrors('password'); ?>
+                    </div>
+
+                    <div class="field">
+                        <label class="label" for="confirm_password">Confirm Password</label>
+                        <div class="control">
+                            <input class="input <?= $form->errorsClass('confirm_password') ?>" id="confirm_password" type="password" placeholder="Confirm your password" name="confirm_password" value="<?= $data['confirm_password'] ?? '' ?>">
+                        </div>
+                        <?php $form->displayErrors('confirm_password'); ?>
+                    </div>
+
+                    <div class="field is-grouped mt-5">
+                        <div class="control">
+                            <button class="button is-warning" type="submit">Create Account</button>
+                        </div>
+                        <div class="control">
+                            <button class="button is-link is-light" type="reset">Reset</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

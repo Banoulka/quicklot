@@ -1,0 +1,192 @@
+<?php
+
+/**
+ * @var Lot[] $lots
+ * @var Auction[] $auctions
+ */
+
+use app\bframe\auth\Auth;
+use app\models\Auction;
+use app\models\lib\Helpers;
+use app\models\Lot;
+use app\models\User;
+
+/**
+ * @var User $user
+ * @var Auction $auction
+ */
+$user = Auth::User();
+
+$lots = $user->lots()->get();
+
+$biddingList = $user->biddingList();
+?>
+
+<section class="section">
+    <div class="container">
+        <h1 class="title">My Profile: </h1>
+
+        <h2 class="flex my-3 subtitle">
+            My Auctions:
+            <a href="/auctions/create" class="button is-warning">Create an Auction</a>
+        </h2>
+        <div class="table-container">
+            <table class="table is-striped is-bordered">
+                <thead>
+                <tr>
+                    <th>Auction ID:</th>
+                    <th>Lot ID:</th>
+                    <th>Started:</th>
+                    <th>Ends:</th>
+                    <th>Starting Price:</th>
+                    <th>Current Bid:</th>
+                    <th>Actions:</th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php foreach ($lots as $lot) : ?>
+                    <?php if ($lot->auction) : ?>
+                    <?php $auction = $lot->auction()->get() ?>
+                        <tr>
+                            <th><?= $auction->id ?></th>
+                            <td><?= $lot->id ?></td>
+                            <td><?= Helpers::readableDate($auction->start_date); ?></td>
+                            <td><?= Helpers::readableDate($auction->end_date); ?></td>
+                            <td>£<?= $auction->price ?></td>
+                            <td>£<?= $auction->highestBid()->amount ?? $auction->price ?></td>
+                            <td>
+                                <form action="/auctions/remove" method="post">
+                                    <input type="hidden" name="auction_id" value="<?= $auction->id ?>">
+                                    <button class="button is-small is-danger" type="submit">Stop Auction</button>
+                                </form>
+                                <a class="button is-small is-warning mt-3" href="/auctions/view?aid=<?= $lot->id ?>">View Auction</a>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <h2 class="my-3 subtitle">My Biddings:</h2>
+
+        <?php foreach ($biddingList as $bidItem) : ?>
+            <a href="/auctions/view?aid=<?= $bidItem->lot_id?>">
+                <p>Bidded on <?= $bidItem->name ?> for £<?= $bidItem->amount?></p>
+            </a>
+        <?php endforeach; ?>
+
+        <h2 class="my-3 subtitle">Current Lots:</h2>
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID:</th>
+                        <th>Lot Name:</th>
+                        <th>Lot Description:</th>
+                        <th>Category:</th>
+                        <th>Images:</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php foreach ($lots as $lot) : ?>
+
+                        <tr>
+                            <th><?= $lot->id ?></th>
+                            <td><?= $lot->name ?></td>
+                            <td><?= $lot->description ?></td>
+                            <td><?= $lot->category->name ?></td>
+                            <td>
+                            <?php foreach ($lot->images as $index => $image) : ?>
+                                <a href="images/uploads/<?= $image->path ?>" target="_blank" style="display: block;">Image <?= ++$index ?></a>
+                            <?php  endforeach; ?>
+                            </td>
+                            <td>
+                                <?php if (!$lot->auction) : ?>
+                                    <div class="block my-1">
+                                        <button class="button is-small is-success open-modal" id="<?= $lot->id ?>">Start Auction</button>
+                                    </div>
+                                    <div class="block my-1">
+                                        <button class="button is-small is-danger is-outlined">Delete Item</button>
+                                    </div>
+                                <?php else : ?>
+                                    <div class="block my-1">
+                                        <button class="button is-small is-danger is-outlined" disabled>Delete Item</button>
+                                    </div>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="modal" id="start_auction">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">Start an auction</p>
+                    <button class="delete" aria-label="close"></button>
+                </header>
+                <form action="/auctions/new" method="post">
+                <section class="modal-card-body">
+                    <p class="mb-5">Make a new auction by an existing item</p>
+                        <input type="hidden" id="lot-id" name="lot_id">
+
+                        <div class="field" id="price-field">
+                            <label class="label" for="price">Item Starting Price:</label>
+                            <div class="control has-icons-left">
+                                <input required type="number" class="input <?= $form->errorsClass('price') ?>" id="price" placeholder="Enter starting bidding price" name="price" value="<?= $data['price'] ?? '' ?>">
+                                <span class="icon is-small is-left">
+                                <i class="fas fa-pound-sign"></i>
+                            </span>
+                            </div>
+                            <?php $form->displayErrors('price'); ?>
+                        </div>
+
+                        <div class="field" id="date-field">
+                            <label class="label" for="end_date">Bidding End Date:</label>
+                            <div class="control">
+                                <input required type="datetime-local" class="input <?= $form->errorsClass('end_date') ?>" id="end_date" placeholder="Enter auction end" name="end_date" value="<?= $data['end_date'] ?? '' ?>">
+                            </div>
+                            <?php $form->displayErrors('end_date'); ?>
+                        </div>
+                </section>
+                <footer class="modal-card-foot">
+                    <button class="button is-success" type="submit">Start Auction</button>
+                </footer>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+
+    let modal = Bulma('#start_auction').modal();
+
+    document.addEventListener('DOMContentLoaded', () => {
+        let buttons = document.getElementsByClassName('open-modal');
+        let hiddenField = document.getElementById('lot-id');
+
+        for (let button of buttons) {
+            button.addEventListener('click', function () {
+                modal.open();
+                hiddenField.value = this.id;
+            })
+        }
+    });
+</script>
+
+<style>
+    .flex {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .flex .button {
+        margin-left: 600px;
+    }
+</style>

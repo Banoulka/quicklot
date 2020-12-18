@@ -1,0 +1,112 @@
+<?php
+
+/**
+ * @var array $categories
+ * @var object $currentCategory
+ * @var Auction[] $auctions
+ * @var string $sortBy
+ */
+
+use app\models\Auction;
+use app\models\lib\Helpers;
+use Carbon\Carbon;
+
+?>
+
+<section class="section">
+    <div class="container">
+        <div class="columns">
+            <div class="column is-one-fifth">
+                <aside class="menu">
+                    <p class="menu-label">
+                        View
+                    </p>
+                    <ul class="menu-list">
+                        <li><a href="/auctions?od=all<?= $currentCategory ? "&cat=$currentCategory->id" : '' ?>" class="<?= $sortBy === 'all' ? 'is-active' : '' ?>">All Auctions</a></li>
+                        <li><a href="/auctions?od=lat<?= $currentCategory ? "&cat=$currentCategory->id" : '' ?>" class="<?= $sortBy === 'lat' ? 'is-active' : '' ?>">Latest Auctions</a></li>
+                        <li><a href="/auctions?od=old<?= $currentCategory ? "&cat=$currentCategory->id" : '' ?>" class="<?= $sortBy === 'old' ? 'is-active' : '' ?>">Oldest Auctions</a></li>
+                        <li><a href="/auctions?od=end<?= $currentCategory ? "&cat=$currentCategory->id" : '' ?>" class="<?= $sortBy === 'end' ? 'is-active' : '' ?>">Ending Soon</a></li>
+                    </ul>
+
+                    <p class="menu-label">
+                        Categories
+                    </p>
+                    <ul class="menu-list">
+                        <li>
+                            <a href="/auctions?od=<?= $sortBy ?>"
+                               class="<?= !$currentCategory ? 'is-active' : ''?>">All Categories</a></li>
+                        <?php foreach ($categories as $category) : ?>
+                            <li><a href="/auctions?cat=<?= $category->id . '&od=' . $sortBy ?>"
+                                    class="<?= $currentCategory ? $currentCategory->id === $category->id ? 'is-active' : '' : '' ?>"
+                                ><?= $category->name ?></a></li>
+                        <?php endforeach; ?>
+                    </ul>
+                </aside>
+            </div>
+
+            <div class="column">
+                <h1 class="title">Auction List: </h1>
+                <div class="columns is-multiline">
+                    <?php foreach ($auctions as $auction) : ?>
+                        <div class="column is-one-third">
+                            <div class="card <?= $auction->isFinished() ? 'ended' : ''?>">
+                                <header class="card-header">
+                                    <p class="card-header-title is-flex is-flex-direction-row is-align-content-center">
+                                        <?= $auction->name ?>
+                                        <span class="tag is-dark" style="margin-left: auto;"><?= $auction->category()->get()->name ?></span>
+                                    </p>
+                                </header>
+                                <div class="card-content">
+                                    <div class="content">
+                                        <figure class="image-contain">
+                                            <img src="images/uploads/<?= $auction->randomImage()->path ?? 'placeholder.jpg' ?>">
+                                        </figure>
+                                        <?= $auction->description ?>
+                                        <hr />
+                                        <?php if ($auction->isFinished()) : ?>
+                                            <p class="has-text-danger">Ended <?= Helpers::timeElapse($auction->end_date) ?></p>
+                                        <?php else : ?>
+                                            <time class="mt-4 has-text-info">Ends in
+                                                <?= Carbon::parse($auction->end_date)->diffForHumans([], \Carbon\CarbonInterface::DIFF_ABSOLUTE, true, 3) ?></time>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                                <footer class="card-footer">
+                                    <a href="/auctions/view?aid=<?= $auction->id ?>" class="card-footer-item button has-text-link is-ghost">View</a>
+                                </footer>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .menu-list a.is-active {
+        background-color: #ffdd57 !important;
+        color: black !important;
+    }
+
+    .image-contain {
+        width: auto;
+        height: auto;
+    }
+
+    .image-contain img {
+        max-height: 160px;
+    }
+
+    .card.ended:before {
+        content: 'sold';
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        color: rgba(255, 0, 0, 0.1);
+        position: absolute;
+        top: 35%;
+        left: 45%;
+        transform-origin: center;
+        transform: rotate(30deg) scale(6);
+    }
+</style>

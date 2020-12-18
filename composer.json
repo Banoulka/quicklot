@@ -1,0 +1,20 @@
+{
+    "name": "natha/assignment-2-auction",
+    "authors": [
+        {
+            "name": "Nathan Bamford",
+            "email": "nathanbammy@hotmail.co.uk"
+        }
+    ],
+    "require": {
+      "ext-pdo": "*",
+      "ext-json": "*",
+        "nesbot/carbon": "^2.42",
+        "vlucas/phpdotenv": "^5.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "app\\": "./app"
+        }
+    }
+}

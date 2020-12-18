@@ -1,0 +1,113 @@
+<section class="section">
+    <div class="container">
+
+        <div class="columns">
+            <div class="column is-half is-offset-one-quarter">
+                <h1 class="title">Create an Auction</h1>
+
+                <form action="/auctions/create" method="post" enctype="multipart/form-data">
+
+                    <div class="field">
+                        <label class="label" for="name">Item Name:</label>
+                        <div class="control">
+                            <input class="input <?= $form->errorsClass('name') ?>" id="name" placeholder="Enter item name" name="name" value="<?= $data['name'] ?? '' ?>">
+                        </div>
+                        <?php $form->displayErrors('name'); ?>
+                    </div>
+
+                    <div class="field">
+                        <label class="label" for="description">Item Description:</label>
+                        <div class="control">
+                            <textarea class="textarea <?= $form->errorsClass('description') ?>" id="description" placeholder="Enter item description" name="description"><?= $data['description'] ?? '' ?></textarea>
+                        </div>
+                        <?php $form->displayErrors('description'); ?>
+                    </div>
+
+                    <div class="field">
+                        <label class="label" for="category">Item Category:</label>
+                        <div class="select">
+                            <select id="category" name="category">
+                                <?php foreach ($categories as $category) : ?>
+                                    <option value="<?= $category->id ?>"><?= $category->name ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="control">
+                            <label class="checkbox">
+                            <input id="check-control" type="checkbox" name="start" <?= isset($data['start']) ? 'checked' : '' ?>>
+                                Start Auction Immediately
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="field" id="price-field">
+                        <label class="label" for="price">Item Starting Price:</label>
+                        <div class="control has-icons-left">
+                            <input type="number" class="input <?= $form->errorsClass('price') ?>" id="price" placeholder="Enter starting bidding price" name="price" value="<?= $data['price'] ?? '' ?>">
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-pound-sign"></i>
+                            </span>
+                        </div>
+                        <?php $form->displayErrors('price'); ?>
+                    </div>
+
+                    <div class="field" id="date-field">
+                        <label class="label" for="end_date">Bidding End Date:</label>
+                        <div class="control">
+                            <input type="datetime-local" class="input <?= $form->errorsClass('end_date') ?>" id="end_date" placeholder="Enter auction end" name="end_date" value="<?= $data['end_date'] ?? '' ?>">
+                        </div>
+                        <?php $form->displayErrors('end_date'); ?>
+                    </div>
+
+                    <div class="file">
+                        <label class="file-label">
+                            <input class="file-input" type="file" name="images[]" accept="image/*" multiple>
+                            <span class="file-cta">
+                                <span class="file-icon">
+                                    <i class="fas fa-upload"></i>
+                                </span>
+                                <span class="file-label">
+                                    Upload Images
+                                </span>
+                            </span>
+                        </label>
+                    </div>
+
+                    <div class="field is-grouped mt-5">
+                        <div class="control">
+                            <button class="button is-warning" type="submit">Create Product</button>
+                        </div>
+                        <div class="control">
+                            <button class="button is-link is-light" type="reset">Reset</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const priceField = document.getElementById('price-field');
+        const dateField = document.getElementById('date-field');
+
+        priceField.style.display = 'none';
+        dateField.style.display = 'none';
+
+        document.getElementById('check-control').addEventListener('change', (e) => {
+            if (e.target.checked) {
+                priceField.style.display = 'block';
+                dateField.style.display = 'block';
+            } else {
+                priceField.style.display = 'none';
+                dateField.style.display = 'none';
+            }
+        });
+    })
+</script>
