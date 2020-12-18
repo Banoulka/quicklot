@@ -99,7 +99,7 @@ $biddingList = $user->biddingList();
                             <td><?= $lot->category->name ?></td>
                             <td>
                             <?php foreach ($lot->images as $index => $image) : ?>
-                                <a href="images/uploads/<?= $image->path ?>" target="_blank" style="display: block;">Image <?= ++$index ?></a>
+                                <a href="/public/images/uploads/<?= $image->path ?>" target="_blank" style="display: block;">Image <?= ++$index ?></a>
                             <?php  endforeach; ?>
                             </td>
                             <td>

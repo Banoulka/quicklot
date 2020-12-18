@@ -31,7 +31,7 @@ $owner = $auction->lot->owner()->get();
                         <div class="content">
                             <p class="subtitle"><?= $auction->lot->description ?></p>
                             <?php foreach ($auction->lot->images()->get() as $image) : ?>
-                                <img src="/images/uploads/<?= $image->path ?>" alt="Lot Image" class="lot-image">
+                                <img src="/public/images/uploads/<?= $image->path ?>" alt="Lot Image" class="lot-image">
                             <?php endforeach; ?>
                             <p class="mt-2">Started at: £<?= $auction->price ?></p>
                         </div>
@@ -81,7 +81,7 @@ $owner = $auction->lot->owner()->get();
 
                     <div class="level profile-level">
                         <div class="level-left">
-                            <img src="/images/<?= $activity->user->profile_picture ? "uploads/users/" . $activity->user->profile_picture : "placeholder.png"  ?>" alt="Profile Image" class="profile-display">
+                            <img src="/public/images/<?= $activity->user->profile_picture ? "uploads/users/" . $activity->user->profile_picture : "placeholder.png"  ?>" alt="Profile Image" class="profile-display">
                             <span class="ml-4"><?= $activity->user->name ?></span>
                         </div>
                         <div class="level-right">
