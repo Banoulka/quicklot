@@ -8,7 +8,7 @@
 date_default_timezone_set('gb');
 
 // LOAD DOT ENV
-$dotenv = \Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ . "/../");
 try {
     $dotenv->load();
 } catch (Exception $exception) {
