@@ -7,7 +7,7 @@ namespace app\bframe\middleware;
 use app\bframe\facades\Request;
 use app\bframe\facades\Route;
 
-class Auth
+class Auth extends Middleware
 {
     public static function resolve(Request $request)
     {

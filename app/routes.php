@@ -1,6 +1,8 @@
 <?php
 
 use app\bframe\facades\Route;
+use app\controllers\api\ApiAuctionController;
+use app\controllers\api\ApiBiddingActivityController;
 use app\controllers\AuctionController;
 use app\controllers\AuthController;
 use app\controllers\PageController;
@@ -11,6 +13,7 @@ Route::get('/', [PageController::class, 'index']);
 
 // Auth Routes
 Route::get('/login', [PageController::class, 'login'])->middleware('guest');
+
 Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth');
 
@@ -28,3 +31,7 @@ Route::post('/auctions/new', [AuctionController::class, 'newAuction'])->middlewa
 Route::post('/auctions/remove', [AuctionController::class, 'remove'])->middleware('auth');
 Route::get('/auctions/view', [AuctionController::class, 'view']);
 Route::post('/auctions/bid', [AuctionController::class, 'bid'])->middleware('auth');
+
+// Api routes
+Route::get('/api/auctions/bid', [ApiAuctionController::class, 'bid'])->middleware('auth');
+Route::get('/api/bids', [ApiBiddingActivityController::class, 'bids'])->middleware('auth');

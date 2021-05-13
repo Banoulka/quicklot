@@ -42,6 +42,7 @@ class Request
 
         foreach ($keyValidations as $key => $validations)
         {
+
             if (!is_array($validations)) {
                 $validations = explode('|', $validations);
             }
@@ -66,6 +67,7 @@ class Request
             }
         }
 
+        // Either validator errors or a list of valid data
         $form = new Form($validator->getErrors());
         $data = $this->all();
 

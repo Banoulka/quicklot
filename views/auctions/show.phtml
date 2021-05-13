@@ -40,16 +40,17 @@ $owner = $auction->lot->owner()->get();
                         <?php if ($auction->isFinished()) : ?>
                             <p class="has-text-danger">Ended <?= Carbon::parse($auction->end_date)->diffForHumans() ?></p>
                         <?php else : ?>
-                            <time class="has-text-info">Ends in <?= Carbon::parse($auction->end_date)->diffForHumans([], \Carbon\CarbonInterface::DIFF_ABSOLUTE, false, 3) ?></time>
+                            <time class="has-text-info">Ends in <span id="end_date">00:00:00</span></time>
                         <?php endif; ?>
                     </footer>
                 </div>
-
-                <h3 class="my-5 title is-3">Place a bid: <span style="margin-left: 100px;">+ £<?= $auction->highestBid()->amount ?? $auction->price ?></span></h3>
+                <h3 class="my-5 title is-3">Place a bid: <span style="margin-left: 100px;">+ £<span id="highestBid"><?= $auction->highestBid()->amount ?? $auction->price ?></span></span></h3>
                 <?php if (!Auth::loggedIn()) : ?>
                     <p>Please <a href="/login">login</a> to place a bid</p>
                 <?php elseif ($auction->isFinished()) : ?>
                     <p>Bidding has ended.</p>
+                <?php elseif (Auth::User()->id == $auction->highestBid()->user->id) : ?>
+                    <p>You are the highest bidder</p>
                 <?php elseif ($auction->lot->user_id != Auth::User()->id) : ?>
                     <form action="/auctions/bid" method="post">
                         <input type="hidden" value="<?= $auction->id ?>" name="auction_id">
@@ -77,26 +78,104 @@ $owner = $auction->lot->owner()->get();
             <div class="column has-text-centered has-line">
                 <h2 class="title mt-4">Bidding Activity:</h2>
 
-                <?php foreach ($biddingActivity as $activity) : ?>
+                <div id="biddingParent">
+                    <?php /* COMMENT START =============?>
+                    <?php foreach ($biddingActivity as $activity) : ?>
 
-                    <div class="level profile-level">
-                        <div class="level-left">
-                            <img src="/public/images/<?= $activity->user->profile_picture ? "uploads/users/" . $activity->user->profile_picture : "placeholder.png"  ?>" alt="Profile Image" class="profile-display">
-                            <span class="ml-4"><?= $activity->user->name ?></span>
-                        </div>
-                        <div class="level-right">
-                            <div class="is-flex is-flex-direction-column">
-                                <span class="bold">£<?= $activity->amount ?></span>
-                                <span class="small"><?= Helpers::timeElapse($activity->created_at) ?></span>
+                        <div class="level profile-level">
+                            <div class="level-left">
+                                <img src="/public/images/<?= $activity->user->profile_picture ? "uploads/users/" . $activity->user->profile_picture : "placeholder.png"  ?>" alt="Profile Image" class="profile-display">
+                                <span class="ml-4"><?= $activity->user->name ?></span>
+                            </div>
+                            <div class="level-right">
+                                <div class="is-flex is-flex-direction-column">
+                                    <span class="bold">£<?= $activity->amount ?></span>
+                                    <span class="small"><?= Helpers::timeElapse($activity->created_at) ?></span>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                <?php endforeach; ?>
+                    <?php endforeach; ?>
+                    <?php COMMENT END ===========*/ ?>
+                </div>
             </div>
         </div>
     </div>
 </section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Auction scripts
+        const parentBids = document.getElementById('biddingParent');
+        const highestBid = document.getElementById('highestBid');
+        const endTime = document.getElementById('end_date');
+
+        let auction = <?= json_encode($auction) ?>;
+        let highest = 0;
+        let bids = [];
+
+        let firstCall = true;
+
+        fetchBiddingActivity();
+
+        function displayBids() {
+            parentBids.innerHTML = '';
+
+            bids.forEach(bid => {
+                parentBids.innerHTML += `
+                    <div class="level profile-level">
+                        <div class="level-left">
+                            <img src="/public/images/${bid.user.profile_picture}" alt="Profile Image" class="profile-display">
+                            <span class="ml-4">${bid.user.name}</span>
+                        </div>
+                        <div class="level-right">
+                            <div class="is-flex is-flex-direction-column">
+                                <span class="bold">£${bid.amount}</span>
+                                <span class="small">${bid.time}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (highest)
+                highestBid.innerHTML = highest.amount;
+        }
+
+        async function fetchBiddingActivity() {
+            const res = await fetch(`/api/bids?aid=${auction.id}`);
+            const data = await res.json();
+            console.log("FETCHBIDDINGACTIVITY", data);
+            console.log(bids);
+
+            if (firstCall) {
+                bids = data.bids;
+                highest = data.highest;
+                firstCall = false;
+                // Call the fetch method each second to check for bidding updates
+                window.setInterval(fetchBiddingActivity, 1000);
+                displayBids();
+            } else {
+                // If this is not the first call we should check for updates in the bidding activity
+                checkNewBids(data);
+            }
+
+            // Change the timer
+            endTime.innerHTML = data.auction.end_date;
+        }
+
+        function checkNewBids(data) {
+            // This function checks for new bids and modifies the current bids if they are different
+            if (data.bids.length !== bids.length) {
+                // console.log('current bid length: ' + bids.length);
+                // console.log('a new bid!!!');
+                bids = data.bids;
+                highest = data.highest;
+                displayBids();
+            }
+        }
+    });
+</script>
 
 <style>
     .lot-image {

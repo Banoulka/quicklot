@@ -19,7 +19,7 @@ trait HasImages
         $this->guessIdField();
 
         // Upload the file
-        $dir = "images/uploads";
+        $dir = "public/images/uploads";
         $fileName = md5(microtime()) . "." .strtolower(pathinfo($imageData['name'], PATHINFO_EXTENSION));
 
         $targetFile = $dir . '/' . $fileName;

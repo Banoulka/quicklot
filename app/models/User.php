@@ -13,7 +13,7 @@ use app\models\lib\Database;
 
 
 
-class User extends Authenticatable
+class User extends Authenticatable implements \JsonSerializable
 {
     public string $email, $password, $name;
 
@@ -41,7 +41,15 @@ class User extends Authenticatable
 
         $data = $stmt->fetchAll();
 
-
         return $data;
     }
+
+    public function jsonSerialize()
+    {
+        return [
+            'name' => $this->name,
+            'profile_picture' => $this->profile_picture ? "uploads/users/" . $this->profile_picture : "placeholder.png",
+        ];
+    }
+
 }

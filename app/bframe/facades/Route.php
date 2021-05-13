@@ -2,16 +2,14 @@
 
 namespace app\bframe\facades;
 
-use app\bframe\facades\Request;
-
 class Route
 {
     private static array $getRoutes = [];
     private static array $postRoutes = [];
 
-    private string $method, $url;
+    public string $method, $url;
 
-    public function __construct($method, $url)
+    private function __construct($method, $url)
     {
         $this->method = $method;
         $this->url = $url;
@@ -77,7 +75,7 @@ class Route
                 }
             }
 
-            // Call function
+            // Call controller function
             call_user_func($fn, $request);
         } else {
             // Send error

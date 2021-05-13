@@ -5,8 +5,9 @@ namespace app\models;
 
 
 use app\bframe\abstracts\Model;
+use app\models\lib\Helpers;
 
-class BiddingActivity extends Model
+class BiddingActivity extends Model implements \JsonSerializable
 {
     public int $amount;
 
@@ -24,5 +25,15 @@ class BiddingActivity extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->id,
+            'user' => $this->user,
+            'amount' => $this->amount,
+            'time' => Helpers::timeElapse($this->created_at),
+        ];
     }
 }
