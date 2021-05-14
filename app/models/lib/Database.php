@@ -21,6 +21,8 @@ class Database {
     {
         if (self::$_dbInstance === null) {
 
+            // If the database is local then use local settings
+            // otherwise use the .env settings
             if ($GLOBALS['LOCAL_DB']) {
                 $username ='root';
                 $password = '';

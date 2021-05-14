@@ -15,6 +15,7 @@ class Guest extends Middleware
         if ( Auth::loggedIn() ) {
             Route::redirect($request->from ?? '/');
         } else {
+            // do nothing
             return;
         }
     }

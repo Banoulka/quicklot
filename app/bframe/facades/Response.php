@@ -26,6 +26,15 @@ class Response
         return new Response();
     }
 
+    public static function api($data) {
+        header('Content-Type: application/json');
+
+        echo json_encode($data);
+
+        // Return a new reponse
+        return new Response();
+    }
+
     public function status($code)
     {
         // Change the http status code

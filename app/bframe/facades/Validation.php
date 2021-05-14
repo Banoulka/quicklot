@@ -11,7 +11,6 @@ class Validation
     public function __construct()
     {
         $this->errors = [];
-
     }
 
     public function required($key, $value)

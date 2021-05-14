@@ -22,7 +22,7 @@ class PageController extends Controller
     public static function index(Request $request)
     {
 //        self::generateRandomUsers(500);
-//        self::generateRandomLots('electronics', 1);
+//        self::generateRandomLots('women\'s clothing', 6);
 
         Response::render('pages/index');
     }
@@ -107,7 +107,7 @@ class PageController extends Controller
             $image = $product->image;
             $id = md5(microtime()) . ".jpg";
 
-            $pathInfo = 'images/uploads/' . $id;
+            $pathInfo = 'public/images/uploads/' . $id;
 
             file_put_contents($pathInfo, file_get_contents($image));
 

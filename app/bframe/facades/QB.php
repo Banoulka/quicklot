@@ -93,6 +93,7 @@ class QB
     {
         $sql = "SELECT ";
 
+        // If there is no select option then select everything by default
         if (count($this->select) <= 1) {
             // Append one select, usually *
             $sql .= $this->select[0] . " ";
@@ -105,11 +106,14 @@ class QB
         $sql .= "FROM $this->tableName";
 
         // WHERE CLAUSES
+        // If there are 'where' clauses add them to the statement
         if (!empty($this->params)) {
             // there are params
             foreach ($this->params as $key => $value) {
                 $keyName = $key . "Value";
                 $operator = $value['operator'];
+
+                // Paramter name binding with :value
                 $sql .= " WHERE $key $operator :$keyName";
             }
         }
